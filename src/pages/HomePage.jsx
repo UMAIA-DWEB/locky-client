@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 
 function HomePage() {
@@ -54,28 +55,30 @@ function HomePage() {
           {stations && (
             <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {stations.map((s) => (
-                <li
-                  key={s.id}
-                  className="group relative flex cursor-pointer flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-slate-300 hover:shadow-md"
-                >
-                  <div>
-                    <h3 className="mb-1 text-lg font-semibold text-slate-800 transition-colors group-hover:text-amber-700">
-                      {s.name}
-                    </h3>
-                    <div className="flex items-center gap-1.5 text-sm font-medium text-slate-500">
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      {s.city}
+                <li key={s.id}>
+                  <Link
+                    to={`/stations/${s.id}`}
+                    className="group relative flex h-full flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-slate-300 hover:shadow-md"
+                  >
+                    <div>
+                      <h3 className="mb-1 text-lg font-semibold text-slate-800 transition-colors group-hover:text-amber-700">
+                        {s.name}
+                      </h3>
+                      <div className="flex items-center gap-1.5 text-sm font-medium text-slate-500">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        {s.city}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="mt-4 border-t border-slate-100 pt-3">
-                    <p className="text-sm text-slate-400 truncate">
-                      {s.address}
-                    </p>
-                  </div>
+                    <div className="mt-4 border-t border-slate-100 pt-3">
+                      <p className="text-sm text-slate-400 truncate">
+                        {s.address}
+                      </p>
+                    </div>
+                  </Link>
                 </li>
               ))}
             </ul>
