@@ -5,6 +5,9 @@ import HomePage from './pages/HomePage';
 import StationDetailPage from './pages/StationDetailPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import NewReservationPage from './pages/NewReservationPage';
+import ReservationDetailPage from './pages/ReservationDetailPage';
+import EditReservationPage from './pages/EditReservationPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
@@ -12,17 +15,17 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          {/* públicas */}
           <Route path="/" element={<HomePage />} />
           <Route path="/stations/:id" element={<StationDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
 
-          {/* autenticadas */}
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/reservations/new" element={<NewReservationPage />} />
+            <Route path="/reservations/:id" element={<ReservationDetailPage />} />
+            <Route path="/reservations/:id/edit" element={<EditReservationPage />} />
           </Route>
 
-          {/* catch-all */}
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
