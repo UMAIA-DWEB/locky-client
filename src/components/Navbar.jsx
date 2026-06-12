@@ -1,55 +1,52 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
+// barra de navegacao fixa no topo, muda consoante o estado de auth
 function Navbar() {
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const linkBase = 'text-sm font-medium transition-colors';
-  const linkInactive = 'text-slate-600 hover:text-amber-700';
-  const linkActive = 'text-amber-700';
+  // destaca link "Gestao" em qualquer subrota /manage/*
+  const isManaging = location.pathname.startsWith('/manage');
 
-  // sair de rotas privadas antes de limpar a sessão (evita ser empurrado para /login pelo PrivateRoute)
-  const handleLogout = async () => {
+  // navega primeiro para evitar ser empurrado para /login pelo PrivateRoute
+  async function handleLogout() {
     navigate('/');
     await logout();
-  };
+  }
 
   return (
-    <nav className="sticky top-0 z-10 border-b border-slate-200 bg-white/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 md:px-10">
-        <Link
-          to="/"
-          className="text-lg font-bold tracking-tight text-slate-900 transition-colors hover:text-amber-700"
-        >
+    <nav className="bg-neutral-950 text-white">
+      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+        <Link to="/" className="text-xl font-bold hover:text-orange-600">
           LockyClient
         </Link>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 text-sm">
           {loading ? (
-            <div className="h-4 w-24 animate-pulse rounded bg-slate-200" />
+            <span className="text-neutral-400">...</span>
           ) : user ? (
             <>
-              <NavLink
+              <Link
                 to="/dashboard"
-                className={({ isActive }) =>
-                  `${linkBase} ${isActive ? linkActive : linkInactive}`
-                }
+                className={location.pathname === '/dashboard' ? 'text-orange-600' : 'hover:text-orange-600'}
               >
                 Dashboard
-              </NavLink>
-              <span className="text-sm text-slate-600">
-                Olá, <span className="font-medium text-slate-900">{user.username}</span>
-              </span>
-              <button
-                onClick={handleLogout}
-                className={`${linkBase} ${linkInactive}`}
+              </Link>
+              <Link
+                to="/manage/stations"
+                className={isManaging ? 'text-orange-600' : 'hover:text-orange-600'}
               >
-                Terminar sessão
+                Gestão
+              </Link>
+              <span className="text-neutral-300">Olá, {user.username}</span>
+              <button onClick={handleLogout} className="hover:text-orange-600">
+                Sair
               </button>
             </>
           ) : (
-            <Link to="/login" className={`${linkBase} ${linkInactive}`}>
+            <Link to="/login" className="hover:text-orange-600">
               Entrar
             </Link>
           )}

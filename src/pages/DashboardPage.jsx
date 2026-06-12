@@ -4,30 +4,23 @@ import { api } from '../api/client';
 import { useAuth } from '../hooks/useAuth';
 import ConfirmDialog from '../components/ConfirmDialog';
 
-const SIZE_LABELS = {
-  S: 'Pequeno',
-  M: 'Médio',
-  L: 'Grande',
-};
+const SIZE_LABELS = { S: 'Pequeno', M: 'Médio', L: 'Grande' };
 
 function formatDate(iso) {
   if (!iso) return '';
-  const d = new Date(iso);
-  return d.toLocaleString('pt-PT', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  return new Date(iso).toLocaleString('pt-PT', {
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
   });
 }
 
+// dashboard com as reservas do utilizador autenticado
 function DashboardPage() {
   const { user } = useAuth();
   const [reservations, setReservations] = useState(null);
   const [error, setError] = useState(null);
-  const [cancelingId, setCancelingId] = useState(null);
   const [confirmingId, setConfirmingId] = useState(null);
+  const [cancelingId, setCancelingId] = useState(null);
 
   function loadReservations() {
     setError(null);
@@ -44,129 +37,94 @@ function DashboardPage() {
     const id = confirmingId;
     setConfirmingId(null);
     setCancelingId(id);
-
     api.delete(`/api/reservations/${id}`)
       .then(() => {
         setReservations((prev) => prev.filter((r) => r.id !== id));
       })
-      .catch((err) => {
-        alert('Erro ao cancelar: ' + err.message);
-      })
-      .finally(() => {
-        setCancelingId(null);
-      });
+      .catch((err) => alert('Erro ao cancelar: ' + err.message))
+      .finally(() => setCancelingId(null));
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-10 font-sans text-slate-900">
-      <div className="mx-auto max-w-6xl">
-
-        <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <div className="bg-stone-100 min-h-screen">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight">Minhas reservas</h1>
-            <p className="mt-1 text-slate-500">
-              Bem-vindo de volta, <span className="font-medium text-slate-900">{user.username}</span>.
-            </p>
+            <h1 className="text-2xl font-bold text-neutral-950">Minhas reservas</h1>
+            <p className="text-sm text-neutral-700 mt-1">Olá, {user.username}.</p>
           </div>
           <Link
             to="/reservations/new"
-            className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+            className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded text-sm"
           >
             Nova reserva
           </Link>
-        </header>
+        </div>
 
         {error && (
-          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-5 text-red-700">
-            Erro ao carregar reservas: {error}
-          </div>
+          <p className="mb-4 text-red-600">Erro: {error}</p>
         )}
 
         {!reservations && !error && (
-          <ul className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <li key={i} className="h-32 animate-pulse rounded-xl border border-slate-200 bg-white shadow-sm" />
-            ))}
-          </ul>
+          <p className="text-neutral-600">A carregar...</p>
         )}
 
         {reservations && reservations.length === 0 && (
-          <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
-            <h2 className="text-lg font-semibold text-slate-700">Ainda sem reservas</h2>
-            <p className="mt-2 text-sm text-slate-500">
-              Explora as estações disponíveis e reserva o teu primeiro cacifo.
-            </p>
-            <Link
-              to="/"
-              className="mt-5 inline-block rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
-            >
-              Ver estações
+          <div className="bg-white border border-neutral-200 rounded p-8 text-center">
+            <p className="text-neutral-700">Ainda sem reservas.</p>
+            <Link to="/" className="mt-3 inline-block text-orange-600 hover:underline text-sm">
+              Ver estações disponíveis
             </Link>
           </div>
         )}
 
         {reservations && reservations.length > 0 && (
-          <ul className="space-y-4">
+          <div className="flex flex-col gap-3">
             {reservations.map((r) => {
               const locker = r.locker || {};
               const station = locker.station || {};
-              const sizeLabel = SIZE_LABELS[locker.size] || locker.size;
-
               return (
-                <li
-                  key={r.id}
-                  className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-4">
+                <div key={r.id} className="bg-white border border-neutral-200 rounded p-4">
+                  <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900">
-                        {station.name || 'Estação desconhecida'}
-                      </h3>
-                      <p className="mt-0.5 text-sm text-slate-500">
-                        Cacifo {locker.number}
-                        {sizeLabel ? ` - ${sizeLabel}` : ''}
-                        {station.city ? ` - ${station.city}` : ''}
+                      <h3 className="font-semibold text-neutral-950">{station.name || 'Estação'}</h3>
+                      <p className="text-sm text-neutral-700">
+                        Cacifo {locker.number} - {SIZE_LABELS[locker.size] || locker.size}
                       </p>
                     </div>
-                    <span className="rounded-md bg-slate-50 px-3 py-1 text-base font-bold text-slate-900">
-                      {Number(r.totalPrice).toFixed(2)} €
-                    </span>
+                    <p className="font-bold">{Number(r.totalPrice).toFixed(2)} €</p>
                   </div>
 
-                  <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-                    <div className="text-sm text-slate-500">
-                      <span className="text-slate-700">{formatDate(r.startTime)}</span>
-                      <span className="mx-2 text-slate-400">até</span>
-                      <span className="text-slate-700">{formatDate(r.endTime)}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Link
-                        to={`/reservations/${r.id}`}
-                        className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50"
-                      >
-                        Ver detalhe
-                      </Link>
-                      <button
-                        onClick={() => setConfirmingId(r.id)}
-                        disabled={cancelingId === r.id}
-                        className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {cancelingId === r.id ? 'A cancelar...' : 'Cancelar'}
-                      </button>
-                    </div>
+                  <p className="text-sm text-neutral-600 mt-3">
+                    {formatDate(r.startTime)} até {formatDate(r.endTime)}
+                  </p>
+
+                  <div className="mt-3 flex gap-2">
+                    <Link
+                      to={`/reservations/${r.id}`}
+                      className="text-sm px-3 py-1 border border-neutral-300 rounded hover:bg-neutral-100"
+                    >
+                      Ver detalhe
+                    </Link>
+                    <button
+                      onClick={() => setConfirmingId(r.id)}
+                      disabled={cancelingId === r.id}
+                      className="text-sm px-3 py-1 border border-neutral-300 rounded hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                    >
+                      {cancelingId === r.id ? 'A cancelar...' : 'Cancelar'}
+                    </button>
                   </div>
-                </li>
+                </div>
               );
             })}
-          </ul>
+          </div>
         )}
-
       </div>
 
       <ConfirmDialog
         open={confirmingId !== null}
         title="Cancelar reserva?"
-        message="Esta ação não pode ser desfeita. A reserva será removida permanentemente."
+        message="Esta ação não pode ser desfeita."
         confirmText="Sim, cancelar"
         cancelText="Manter"
         variant="danger"

@@ -8,6 +8,8 @@ import DashboardPage from './pages/DashboardPage';
 import NewReservationPage from './pages/NewReservationPage';
 import ReservationDetailPage from './pages/ReservationDetailPage';
 import EditReservationPage from './pages/EditReservationPage';
+import ManageStationsPage from './pages/ManageStationsPage';
+import ManageLockersPage from './pages/ManageLockersPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
@@ -24,6 +26,8 @@ function App() {
             <Route path="/reservations/new" element={<NewReservationPage />} />
             <Route path="/reservations/:id" element={<ReservationDetailPage />} />
             <Route path="/reservations/:id/edit" element={<EditReservationPage />} />
+            <Route path="/manage/stations" element={<ManageStationsPage />} />
+            <Route path="/manage/lockers" element={<ManageLockersPage />} />
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />

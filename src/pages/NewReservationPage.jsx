@@ -2,11 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client';
 
-const SIZE_LABELS = {
-  S: 'Pequeno',
-  M: 'Médio',
-  L: 'Grande',
-};
+const SIZE_LABELS = { S: 'Pequeno', M: 'Médio', L: 'Grande' };
 
 function nowLocalDatetime() {
   const now = new Date();
@@ -41,6 +37,7 @@ function NewReservationPage() {
       .catch((err) => setError(err.message));
   }, []);
 
+  // se a URL trouxer ?lockerId=X, pre-preenche a estacao e o cacifo
   useEffect(() => {
     if (!initialLockerId) return;
     api.get(`/api/lockers/${initialLockerId}`)
@@ -74,10 +71,8 @@ function NewReservationPage() {
   let validationError = null;
   if (!stationId) validationError = 'Escolhe uma estação.';
   else if (!lockerId) validationError = 'Escolhe um cacifo.';
-  else if (!startTime || !endTime) validationError = 'Preenche o início e o fim.';
+  else if (!startTime || !endTime) validationError = 'Preenche as datas.';
   else if (hours <= 0) validationError = 'A data de fim tem que ser depois do início.';
-
-  const showValidation = stationId || lockerId || startTime || endTime;
 
   function handleStationChange(e) {
     setStationId(e.target.value);
@@ -90,7 +85,6 @@ function NewReservationPage() {
 
     setSubmitting(true);
     setError(null);
-
     api.post('/api/reservations', {
       lockerId: Number(lockerId),
       startTime: new Date(startTime).toISOString(),
@@ -103,142 +97,107 @@ function NewReservationPage() {
       });
   }
 
+  const inputClass = 'w-full border border-neutral-300 rounded px-3 py-2 focus:border-orange-600 focus:outline-none';
+
   return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-10 font-sans text-slate-900">
-      <div className="mx-auto max-w-2xl">
-        <Link
-          to="/dashboard"
-          className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-slate-500 transition-colors hover:text-amber-700"
-        >
+    <div className="bg-stone-100 min-h-screen">
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <Link to="/dashboard" className="text-sm text-neutral-600 hover:text-orange-600">
           Voltar ao dashboard
         </Link>
 
-        <header className="mb-6">
-          <h1 className="text-3xl font-extrabold tracking-tight">Nova reserva</h1>
-          <p className="mt-1 text-slate-500">
-            Escolhe uma estação, um cacifo e o período em que o queres usar.
-          </p>
-        </header>
+        <h1 className="text-2xl font-bold text-neutral-950 mt-4 mb-1">Nova reserva</h1>
+        <p className="text-sm text-neutral-700 mb-6">
+          Escolhe uma estação, um cacifo e o período em que o queres usar.
+        </p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <form onSubmit={handleSubmit} className="bg-white border border-neutral-200 rounded p-6">
+          <div className="mb-3">
+            <label htmlFor="station" className="block text-sm font-medium mb-1">Estação</label>
+            <select
+              id="station"
+              value={stationId}
+              onChange={handleStationChange}
+              disabled={!stations}
+              className={inputClass}
+            >
+              <option value="">{stations ? 'Escolher estação...' : 'A carregar...'}</option>
+              {stations?.map((s) => (
+                <option key={s.id} value={s.id}>{s.name} - {s.city}</option>
+              ))}
+            </select>
+          </div>
 
-            <div>
-              <label htmlFor="station" className="mb-1 block text-sm font-medium text-slate-700">
-                Estação
-              </label>
-              <select
-                id="station"
-                value={stationId}
-                onChange={handleStationChange}
-                disabled={!stations}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-slate-900 focus:outline-none disabled:opacity-50"
-              >
-                <option value="">
-                  {stations ? 'Escolher estação...' : 'A carregar estações...'}
+          <div className="mb-3">
+            <label htmlFor="locker" className="block text-sm font-medium mb-1">Cacifo</label>
+            <select
+              id="locker"
+              value={lockerId}
+              onChange={(e) => setLockerId(e.target.value)}
+              disabled={!stationDetail}
+              className={inputClass}
+            >
+              <option value="">
+                {!stationId ? 'Escolhe uma estação primeiro' : (stationDetail ? 'Escolher cacifo...' : 'A carregar...')}
+              </option>
+              {stationDetail?.lockers?.map((l) => (
+                <option key={l.id} value={l.id}>
+                  Cacifo {l.number} - {SIZE_LABELS[l.size] || l.size} - {Number(l.pricePerHour).toFixed(2)} €/h
                 </option>
-                {stations?.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name} - {s.city}
-                  </option>
-                ))}
-              </select>
-            </div>
+              ))}
+            </select>
+          </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
             <div>
-              <label htmlFor="locker" className="mb-1 block text-sm font-medium text-slate-700">
-                Cacifo
-              </label>
-              <select
-                id="locker"
-                value={lockerId}
-                onChange={(e) => setLockerId(e.target.value)}
-                disabled={!stationDetail}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-slate-900 focus:outline-none disabled:opacity-50"
-              >
-                <option value="">
-                  {!stationId
-                    ? 'Escolhe uma estação primeiro'
-                    : stationDetail
-                      ? 'Escolher cacifo...'
-                      : 'A carregar cacifos...'}
-                </option>
-                {stationDetail?.lockers?.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    Cacifo {l.number} - {SIZE_LABELS[l.size] || l.size} - {Number(l.pricePerHour).toFixed(2)} €/h
-                  </option>
-                ))}
-              </select>
+              <label htmlFor="start" className="block text-sm font-medium mb-1">Início</label>
+              <input
+                id="start"
+                type="datetime-local"
+                min={nowLocalDatetime()}
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                className={inputClass}
+              />
             </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label htmlFor="start" className="mb-1 block text-sm font-medium text-slate-700">
-                  Início
-                </label>
-                <input
-                  id="start"
-                  type="datetime-local"
-                  min={nowLocalDatetime()}
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-slate-900 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label htmlFor="end" className="mb-1 block text-sm font-medium text-slate-700">
-                  Fim
-                </label>
-                <input
-                  id="end"
-                  type="datetime-local"
-                  min={startTime || nowLocalDatetime()}
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-slate-900 focus:outline-none"
-                />
-              </div>
+            <div>
+              <label htmlFor="end" className="block text-sm font-medium mb-1">Fim</label>
+              <input
+                id="end"
+                type="datetime-local"
+                min={startTime || nowLocalDatetime()}
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                className={inputClass}
+              />
             </div>
           </div>
 
-          {selectedLocker && (
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="text-sm text-slate-600">
-                  {hours > 0
-                    ? `${hours.toFixed(2).replace(/\.?0+$/, '')} horas a ${Number(selectedLocker.pricePerHour).toFixed(2)} €/h`
-                    : 'Define o início e fim para veres o preço'}
-                </span>
-                <span className="text-2xl font-bold text-slate-900">
-                  {estimatedPrice !== null ? `${estimatedPrice.toFixed(2)} €` : '-'}
-                </span>
-              </div>
-            </div>
+          {selectedLocker && hours > 0 && (
+            <p className="mb-3 text-sm text-neutral-700">
+              {hours.toFixed(2).replace(/\.?0+$/, '')} horas a {Number(selectedLocker.pricePerHour).toFixed(2)} €/h = <strong>{estimatedPrice?.toFixed(2)} €</strong>
+            </p>
           )}
 
-          {validationError && showValidation && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-              {validationError}
-            </div>
+          {validationError && (
+            <p className="mb-3 text-sm text-orange-700">{validationError}</p>
           )}
 
           {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-              Erro: {error}
-            </div>
+            <p className="mb-3 text-sm text-red-600">Erro: {error}</p>
           )}
 
-          <div className="flex flex-wrap items-center justify-end gap-3">
+          <div className="flex justify-end gap-2 mt-4">
             <Link
               to="/dashboard"
-              className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+              className="px-4 py-2 border border-neutral-300 rounded hover:bg-neutral-100"
             >
               Cancelar
             </Link>
             <button
               type="submit"
               disabled={!!validationError || submitting}
-              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+              className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded disabled:opacity-50"
             >
               {submitting ? 'A reservar...' : 'Confirmar reserva'}
             </button>
