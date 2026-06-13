@@ -1,4 +1,6 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// em prod o build define VITE_API_URL="" para usar URLs relativos (Nginx proxy)
+// em dev fica undefined no .env -> fallback para a porta local da API
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
 
 async function request(path, { method = 'GET', body, headers = {} } = {}) {
   const opts = {
