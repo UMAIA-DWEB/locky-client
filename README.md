@@ -1,16 +1,74 @@
-# React + Vite
+# LockyClient
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend ReactJS para o sistema de gestão de cacifos LockyAPI, desenvolvido no âmbito do M2 da unidade curricular de Desenvolvimento Web II.
 
-Currently, two official plugins are available:
+> M2 - DWEB II (UMAIA, 2025/2026)
+>
+> Grupo `inf25dw2g02`; Membros: Ricardo Dias (A047068@umaia.pt)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Descrição do tema
 
-## React Compiler
+A LockyAPI (desenvolvida no M1) é uma API REST para gestão de cacifos inteligentes, inspirada nos cacifos públicos da Locky Portugal. Neste M2 implementei o frontend que a consome: páginas públicas para consultar estações e cacifos, autenticação via GitHub OAuth e uma área autenticada para gerir reservas e administrar o catálogo.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+A documentação está escrita em [Markdown](https://www.markdownguide.org/).
 
-## Expanding the ESLint configuration
+## Organização do repositório
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+* **Código-fonte** está em [`src/`](src/).
+* **Capítulos do relatório** estão em [`doc/`](doc/).
+* **Configuração Docker** na raiz: [`Dockerfile`](Dockerfile), [`Dockerfile.dev`](Dockerfile.dev), [`docker-compose.yml`](docker-compose.yml) (produção) e [`docker-compose.dev.yml`](docker-compose.dev.yml).
+* **Configuração Nginx** em [`nginx.conf`](nginx.conf).
+* **Repositório da API adaptada** (fork do M1): <https://github.com/UMAIA-DWEB/locky-api-m2>
+
+## Galeria
+
+| Homepage | Detalhe de estação |
+| :---: | :---: |
+| ![Homepage](doc/images/01-homepage.png) | ![Station detail](doc/images/02-station-detail.png) |
+
+| Dashboard | Nova reserva |
+| :---: | :---: |
+| ![Dashboard](doc/images/03-dashboard.png) | ![Nova reserva](doc/images/04-new-reservation.png) |
+
+| Gestão de estações | Gestão de cacifos |
+| :---: | :---: |
+| ![Manage stations](doc/images/05-manage-stations.png) | ![Manage lockers](doc/images/06-manage-lockers.png) |
+
+## Tecnologias
+
+* [React 18](https://react.dev)
+* [Vite 6](https://vitejs.dev)
+* [react-router-dom v6](https://reactrouter.com)
+* [Tailwind CSS v3](https://v3.tailwindcss.com)
+* [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) (Web API nativa)
+* [Express 5](https://expressjs.com), [Sequelize 6](https://sequelize.org), [Passport](https://www.passportjs.org/) (reutilizados do M1)
+* [MySQL 8](https://www.mysql.com/)
+* [Docker Compose](https://docs.docker.com/compose/) + [Nginx](https://nginx.org/)
+
+### Bibliotecas adicionais
+
+* [Docker](https://www.docker.com/) (Docker Desktop em Windows)
+* [DockerHub](https://hub.docker.com/u/inf25dw2g02) para distribuição das imagens
+* [GitHub OAuth](https://docs.github.com/en/apps/oauth-apps) para autenticação
+
+## Relatório
+
+### Apresentação do projeto
+
+* Capítulo 1: [Apresentação do projeto](doc/c1.md)
+
+### Recursos
+
+* Capítulo 2: [Recursos](doc/c2.md)
+
+### Produto
+
+* Capítulo 3: [Produto](doc/c3.md)
+
+### Apresentação
+
+* Capítulo 4: [Apresentação](doc/c4.md)
+
+## Equipa
+
+* Ricardo Dias [@ricardodias06](https://github.com/ricardodias06)
