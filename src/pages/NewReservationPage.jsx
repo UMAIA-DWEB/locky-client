@@ -49,10 +49,8 @@ function NewReservationPage() {
   }, [initialLockerId]);
 
   useEffect(() => {
-    if (!stationId) {
-      setStationDetail(null);
-      return;
-    }
+    if (!stationId) return;
+
     api.get(`/api/stations/${stationId}`)
       .then(setStationDetail)
       .catch((err) => setError(err.message));
@@ -75,8 +73,13 @@ function NewReservationPage() {
   else if (hours <= 0) validationError = 'A data de fim tem que ser depois do início.';
 
   function handleStationChange(e) {
-    setStationId(e.target.value);
+    const value = e.target.value;
+    setStationId(value);
     setLockerId('');
+    
+    if (!value) {
+      setStationDetail(null);
+    }
   }
 
   function handleSubmit(e) {

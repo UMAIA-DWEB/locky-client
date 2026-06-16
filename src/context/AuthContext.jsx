@@ -26,6 +26,7 @@ export function AuthProvider({ children }) {
 
   // hidrata no mount
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh();
   }, [refresh]);
 
